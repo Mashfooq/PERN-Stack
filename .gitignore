@@ -1,0 +1,4 @@
+postgres-data
+frontend/Dockerfile
+frontend/.dockerignore
+backend
