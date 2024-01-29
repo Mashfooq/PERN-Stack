@@ -19,5 +19,7 @@ Created `docker-compose.yml` file
         - PG Admin login password - root
     Created server in PGAdmin
         - Created servers - PERN Stack
+    Access pgamin via
+        - http://localhost:8080
 
 **Reference** : https://www.youtube.com/watch?v=bu6IURMFZwQ&t=365s&ab_channel=Abstractprogrammer
