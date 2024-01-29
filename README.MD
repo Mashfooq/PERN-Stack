@@ -1,9 +1,14 @@
 # PERN STACK
 
 **Date** : 27-01-2024
-Pulled react with vite using command - npm create vite@latest
 
-Created docker file for front end. 
+    Pulled react with vite using command - npm create vite@latest
+
+        - Project name - frontend
+        - Frame work - react
+        - Variant - Typescript
+
+    Created docker file for front end. 
 
 **Date** : 21-01-2024
 
