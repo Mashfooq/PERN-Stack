@@ -1,4 +1,6 @@
 postgres-data
 frontend/Dockerfile
 frontend/.dockerignore
+frontend/node_modules
+frontend/package-lock.json
 backend

@@ -1,4 +1,9 @@
 # PERN STACK
+**Date** : 30-01-2024
+
+    Setting up tailwind in our project
+
+        - Reference - https://tailwindcss.com/docs/guides/vite
 
 **Date** : 27-01-2024
 
