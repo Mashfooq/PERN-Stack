@@ -5,8 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
 
-   // we need to define which port we will run on
-   server: {
+  // we need to define which port we will run on
+  server: {
     watch: {
       usePolling: true,
     },
