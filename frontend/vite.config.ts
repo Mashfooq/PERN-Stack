@@ -7,6 +7,7 @@ export default defineConfig({
 
   // we need to define which port we will run on
   server: {
+    proxy: { "/api": "http://backend:3002" },
     watch: {
       usePolling: true,
     },

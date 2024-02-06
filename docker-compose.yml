@@ -8,25 +8,28 @@ services:
       - "5173:5173"
     volumes:
       - './frontend:/home/app/frontend'
+      - './backend:/home/app/backend'
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+    networks:
+      - PERN-networks
+
+  backend:
+    build: ./backend
+    container_name: services-backend
+    restart: always
+    ports:
+      - "3002:3002"
+    volumes:
+      - './backend:/home/app/backend'
     stdin_open: true
     tty: true
     # depends_on:
     #   - db
-    # networks:
-    #   - PERN-networks
-
-  # backend:
-  #   build: ./backend/docker
-  #   container_name: services-backend
-  #   restart: always
-  #   ports:
-  #     - "5000:5000"
-  #   stdin_open: true
-  #   tty: true
-  #   depends_on:
-  #     - db
-  #   networks:
-  #     - PERN-networks
+    networks:
+      - PERN-networks
 
   # db:
   #   image: postgres
@@ -57,9 +60,9 @@ services:
   #   networks:
   #     - PERN-networks
 
-# networks:
-#   PERN-networks:
-#     driver: bridge
+networks:
+  PERN-networks:
+    driver: bridge
 
 # volumes:
 #   application-data:
