@@ -63,24 +63,24 @@ export default function App() {
         <h1 className="text-4xl font-bold mb-4">TODO</h1>
       </div>
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-lg">
         <form onSubmit={addTask} className="mb-4">
           <label htmlFor="chat" className="sr-only">
             What needs to be done?
           </label>
-          <div className="flex items-center  ml-4">
+          <div className="flex items-center ml-4">
             <input
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               type="text"
               id="chat"
-              className="block flex-grow p-2.5 text-sm text-gray-900 bg-white rounded-l-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+              className="block flex-auto p-2.5 text-sm text-gray-900 bg-white rounded-l-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
               placeholder="What needs to be done?"
               required
             />
             <button
               type="submit"
-              className="p-2 text-blue-600 rounded-r-lg cursor-pointer hover:bg-blue-100"
+              className="px-2 py-3 text-blue-600 rounded-r-lg cursor-pointer hover:bg-blue-100"
             >
               <svg
                 className="w-5 h-5 rotate-90 rtl:-rotate-90"
