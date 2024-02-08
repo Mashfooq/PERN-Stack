@@ -17,23 +17,44 @@ export default function App() {
   const addTask = async (e: FormEvent) => {
     e.preventDefault()
     try {
-      const newTask = await taskRepo.insert({ title: newTaskTitle })
-      setTasks([...tasks, newTask])
+      // we should remove the manual adding of new Tasks to the component's state:
+      // const newTask = await taskRepo.insert({ title: newTaskTitle })
+      // setTasks([...tasks, newTask])
+
+      // This will add tasks immidiately to the component 
+      await taskRepo.insert({ title: newTaskTitle })
       setNewTaskTitle("")
     } catch (error) {
       alert((error as { message: string }).message)
     }
   }
 
+  // This below method doesn't load content in realtime, as in multiplayer is not active
+  // useEffect(() => {
+  //   taskRepo.find({
+  //     limit: 20,
+  //     orderBy: { createdAt: "asc" }
+  //   })
+  //     .then(setTasks);
+  //   setTimeout(() => {
+  //     setLoading(false);
+  //   }, 500);
+  // }, []);
+
   useEffect(() => {
-    taskRepo.find({
-      limit: 20,
-      orderBy: { createdAt: "asc" }
-    })
-      .then(setTasks);
-    setTimeout(() => {
-      setLoading(false);
-    }, 500);
+    return taskRepo
+      .liveQuery({
+        limit: 20,
+        orderBy: { id: "desc" }
+        // where: { completed: true },
+      })
+      .subscribe(info => {
+        setTasks(info.applyChanges);
+        setTimeout(() => {
+          setLoading(false);
+        }, 500);
+      });
+
   }, []);
 
   return (
@@ -85,14 +106,18 @@ export default function App() {
                 setTasks(tasks => tasks.map(t => (t === task ? value : t)))
 
               const setCompleted = async (completed: boolean) =>
-                setTask(await taskRepo.save({ ...task, completed }))
+                // Optionally remove other redundant state changing code:
+                // setTask(await taskRepo.save({ ...task, completed }))
+                await taskRepo.save({ ...task, completed })
 
               // Update title
               const setTitle = (title: string) => setTask({ ...task, title })
 
               const saveTask = async () => {
                 try {
-                  setTask(await taskRepo.save(task))
+                  // Optionally remove other redundant state changing code:
+                  // setTask(await taskRepo.save(task))
+                  await taskRepo.save(task)
                 } catch (error) {
                   alert((error as { message: string }).message)
                 }
@@ -101,7 +126,8 @@ export default function App() {
               const deleteTask = async () => {
                 try {
                   await taskRepo.delete(task)
-                  setTasks(tasks.filter(t => t !== task))
+                  // Optionally remove other redundant state changing code:
+                  // setTasks(tasks.filter(t => t !== task))
                 } catch (error) {
                   alert((error as { message: string }).message)
                 }

@@ -1,4 +1,4 @@
-import { Entity, Fields, Validators } from "remult"
+import { Entity, Fields } from "remult"
 
 @Entity("tasks", {
   allowApiCrud: true
@@ -7,8 +7,10 @@ export class Task {
   @Fields.autoIncrement()
   id = 0
 
-  @Fields.string({
-    validate: Validators.required
+  @Fields.string<Task>({
+    validate: (task) => {
+      if (task.title.length < 3) throw "Too Short"
+    }
   })
   title = ""
 
