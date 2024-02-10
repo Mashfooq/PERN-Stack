@@ -2,7 +2,12 @@
 
 import { useEffect, useState, FormEvent } from "react";
 import { remult } from "remult";
+
+// Impoer entity
 import { Task } from "../../backend/src/shared/Task";
+
+// Impoer Controller
+import { TasksController } from "../../backend/src/controller/TasksController";
 
 // Import components
 import InputSkeleton from "./components/InputSkeleton";
@@ -44,7 +49,7 @@ export default function App() {
   useEffect(() => {
     return taskRepo
       .liveQuery({
-        limit: 20,
+        // limit: 9,
         orderBy: { id: "desc" }
         // where: { completed: true },
       })
@@ -54,52 +59,57 @@ export default function App() {
           setLoading(false);
         }, 500);
       });
-
   }, []);
+
+  const setAllCompleted = async (completed: boolean) => {
+    await TasksController.setAllCompleted(completed)
+  }
 
   return (
     <div className="flex flex-col items-center justify-center mt-6">
-      <div>
-        <h1 className="text-4xl font-bold mb-4">TODO</h1>
-      </div>
+      
 
-      <div className="w-full max-w-lg">
-        <form onSubmit={addTask} className="mb-4">
-          <label htmlFor="chat" className="sr-only">
-            What needs to be done?
-          </label>
-          <div className="flex items-center ml-4">
-            <input
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
-              type="text"
-              id="chat"
-              className="block flex-auto p-2.5 text-sm text-gray-900 bg-white rounded-l-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="What needs to be done?"
-              required
-            />
-            <button
-              type="submit"
-              className="px-2 py-3 text-blue-600 rounded-r-lg cursor-pointer hover:bg-blue-100"
+      <h1 className="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">TODO</span> 
+      </h1>
+
+      <form onSubmit={addTask} className="mb-4 w-full max-w-lg">
+        <label htmlFor="chat" className="sr-only">
+          What needs to be done?
+        </label>
+        <div className="flex items-center ml-4">
+          <input
+            value={newTaskTitle}
+            onChange={(e) => setNewTaskTitle(e.target.value)}
+            type="text"
+            id="chat"
+            className="block flex-auto p-2.5 text-sm text-gray-900 bg-white hover:bg-gray-100 rounded-l-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none"
+            placeholder="What needs to be done?"
+            required
+          />
+          <button
+            type="submit"
+            className="px-2 py-3 text-blue-600 rounded-r-lg cursor-pointer hover:bg-blue-100"
+          >
+            <svg
+              className="w-5 h-5 rotate-90 rtl:-rotate-90"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 18 20"
             >
-              <svg
-                className="w-5 h-5 rotate-90 rtl:-rotate-90"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 18 20"
-              >
-                <path d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z" />
-              </svg>
-              <span className="sr-only">Send message</span>
-            </button>
-          </div>
-        </form>
+              <path d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z" />
+            </svg>
+            <span className="sr-only">Send message</span>
+          </button>
+        </div>
+      </form>
 
+      <div className="w-full max-w-lg overflow-auto max-h-screen">
         {loading ? (
-          <InputSkeleton length={6} />
+          <InputSkeleton length={9} />
         ) : (
-          <ul className="text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg ml-4 mb-4 mr-4">
+          <ul className="text-sm font-medium text-gray-900 bg-white rounded-lg ml-4 mb-4 mr-4">
             {tasks.map(task => {
 
               const setTask = (value: Task) =>
@@ -134,7 +144,7 @@ export default function App() {
               }
 
               return (
-                <li key={task.id} className="border-b border-gray-200 rounded-t-lg">
+                <li key={task.id} className="border border-gray-200 rounded-t-lg">
                   <div className="flex items-center py-2 ps-3">
                     <input
                       id={`vue-checkbox-${task.id}`}
@@ -142,7 +152,7 @@ export default function App() {
                       value=""
                       checked={task.completed}
                       onChange={e => setCompleted(e.target.checked)}
-                      className="w-8 h-8 text-blue-600 bg-gray-100 rounded"
+                      className="w-8 h-8 text-blue-600 bg-gray-100 rounded border-indigo-500"
                     />
                     {/* <label
                       htmlFor={`vue-checkbox-${task.id}`}
@@ -152,7 +162,7 @@ export default function App() {
                       value={task.title}
                       // htmlFor={`vue-checkbox-${task.id}`}
                       onChange={e => setTitle(e.target.value)}
-                      className="w-full p-2 ms-2 text-sm font-medium text-gray-900"
+                      className="w-full p-2 ms-2 text-sm font-medium text-gray-900 focus:outline-none hover:bg-gray-100 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 rounded"
                     />
                     <button
                       className="p-2 text-blue-600 cursor-pointer hover:bg-blue-100"
@@ -177,6 +187,24 @@ export default function App() {
           </ul>
         )}
       </div>
+
+      {tasks.length > 0 ? (
+        <div className="flex flex-row justify-center items-center">
+          <button onClick={() => setAllCompleted(true)} className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
+            <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+              Set All Completed
+            </span>
+          </button>
+          <button onClick={() => setAllCompleted(false)} className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400">
+            <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+              Set All Uncompleted
+            </span>
+          </button>
+        </div>
+      ) : (
+        <h1>No tasks available</h1>
+      )}
+
 
       <div>
         <p className="mt-2 mb-6 text-md font-medium text-gray-900">
