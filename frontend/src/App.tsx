@@ -11,6 +11,9 @@ import { TasksController } from "../../backend/src/controller/TasksController";
 
 // Import components
 import InputSkeleton from "./components/InputSkeleton";
+import ButtonSkeleton from "./components/buttonSkeleton";
+
+// Import assets
 
 const taskRepo = remult.repo(Task);
 
@@ -67,7 +70,6 @@ export default function App() {
 
   return (
     <div className="flex flex-col items-center justify-center mt-6">
-      
 
       <h1 className="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
         <span className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">TODO</span> 
@@ -188,7 +190,7 @@ export default function App() {
         )}
       </div>
 
-      {tasks.length > 0 ? (
+      {tasks.length > 0 && !loading ? (
         <div className="flex flex-row justify-center items-center">
           <button onClick={() => setAllCompleted(true)} className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
             <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
@@ -201,12 +203,17 @@ export default function App() {
             </span>
           </button>
         </div>
+      ) : (loading ? (
+        <ButtonSkeleton length={2}/>
       ) : (
-        <h1>No tasks available</h1>
-      )}
+        <div className="flex flex-col justify-center items-center">
+          <img src="/NoDataAvailable.gif" alt="No tasks available" />
+          <h2 className="ms-2 text-xl font-semibold text-gray-500 dark:text-gray-400">Nothing on the to-do, just chillin'.</h2>
+        </div>
+      ))}
 
 
-      <div>
+      <div className="fixed bottom-0 z-20">
         <p className="mt-2 mb-6 text-md font-medium text-gray-900">
           Powered by <span>React + Vite + Remult + Docker</span>
         </p>
