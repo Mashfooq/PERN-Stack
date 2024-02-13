@@ -1,7 +1,7 @@
-import { Entity, Fields } from "remult"
+import { Entity, Fields, Allow } from "remult"
 
 @Entity("tasks", {
-  allowApiCrud: true
+  allowApiCrud: Allow.authenticated
 })
 export class Task {
   @Fields.autoIncrement()
