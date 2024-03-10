@@ -211,9 +211,8 @@ export default function App() {
         </div>
       ))}
 
-
       <div className="fixed bottom-0 z-20">
-        <p className="mt-2 mb-6 text-md font-medium text-gray-900">
+        <p className="mt-2 mb-2 text-md font-medium text-gray-900">
           Powered by <span>React + Vite + Remult + Docker</span>
         </p>
       </div>

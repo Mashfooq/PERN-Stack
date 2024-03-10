@@ -1,9 +1,12 @@
 // src/Auth.tsx
 
 import { FormEvent, useEffect, useState } from "react"
-import { remult } from "remult"
 import App from "./App"
 import TodoHeader from "./components/TodoHeader"
+import { AuthController } from "./controller/AuthController";
+import SignOutBanner from "./components/SignOut";
+
+const USER_AGENT = "Todo-0.1";
 
 export default function Auth() {
   const initialFormData = {
@@ -15,50 +18,33 @@ export default function Auth() {
   const [signedIn, setSignedIn] = useState(false)
 
   const signIn = async (e: FormEvent) => {
-    console.log("signin");
-    console.log(formData.userEmail);
-    console.log(formData.password);
+    e.preventDefault();
 
-    e.preventDefault()
-    const result = await fetch("http://backend:3002/api/signIn", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ "userEmail": formData.userEmail, "password": formData.password })
-    })
-    console.log("signin 2");
-    console.log(result);
-    if (result.ok) {
-      console.log("result ok");
-      remult.user = await result.json()
+    if (await AuthController.signInHandler(formData)) {
       setSignedIn(true)
       setFormData(initialFormData);
-    } else {
-      alert(await result.json())
     }
   }
 
-  const handleChange = (e) => {
+  const handleChange = (e: { target: { name: string; value: any; }; }) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const signOut = async () => {
-    await fetch("/api/signOut", {
-      method: "POST"
-    })
-    remult.user = undefined
-    setSignedIn(false)
-  }
   useEffect(() => {
-    fetch("http://backend:3002/api/currentUser").then(async r => {
-      remult.user = await r.json()
-      if (remult.user) setSignedIn(true)
-    })
-  }, [])
+    const fetchData = async () => {
+      if (await AuthController.getCurrentUser()) {
+        setSignedIn(true);
+        setFormData(initialFormData);
+      } else {
+        setSignedIn(false);
+      }
+    };
+  
+    fetchData();
+  }, [signedIn]);  
 
-  if (!signedIn)
+  if (!signedIn) {
     return (
       <div className="flex flex-col items-center justify-center mt-6">
         <TodoHeader title="TODO" />
@@ -118,12 +104,12 @@ export default function Auth() {
           </form> */}
       </div>
     )
-  return (
-    <>
-      <header>
-        Hello {remult.user!.name} <button onClick={signOut}>Sign Out</button>
-      </header>
-      <App />
-    </>
-  )
+  } else {
+    return (
+      <>
+        <SignOutBanner />
+        <App />
+      </>
+    )
+  }
 }

@@ -36,6 +36,9 @@ export class User {
   @Fields.createdAt()
   createdAt?: Date;
 
+  @Fields.string<User>()
+  refreshToken = "";
+
   // Method to update createdAt if empty
   updateCreatedAtIfEmpty() {
     if (!this.createdAt) {

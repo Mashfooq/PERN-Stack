@@ -9,7 +9,7 @@ export class Task {
 
   @Fields.string<Task>({
     validate: (task) => {
-      if (task.title.length < 3) throw "Too Short"
+      if (task.title.length < 3) throw new Error("Too Short")
     }
   })
   title = ""

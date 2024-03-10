@@ -1,31 +1,19 @@
 import express, { Router } from "express"
-import { User } from "../shared/User"
-import { remult } from "remult";
-
-const userRepo = remult.repo(User);
+import cors from "cors";
+import { api } from "./api";
+import { AuthController } from "../controller/AuthController";
 
 export const auth = Router()
 
 auth.use(express.json())
+auth.use(cors());
 
-auth.post("/api/signIn", async (req, res) => {
-  console.log("Requested")
-  const { userEmail, password } = req.body;
-  const user = await userRepo.findOne({ where: { userEmail: userEmail } });
-  if (user && user.password === password) {
-    req.session.user = user;
-    res.json(user);
-  } else {
-    res.status(401).json({ message: "Invalid username or password" });
-  }
-});
+auth.post("/api/signIn", api.withRemult, AuthController.signInHandler);
 
-auth.post("/api/signOut", (req, res) => {
-  req.session.destroy(() => {
-    res.json({ message: "Signed out" });
-  });
-});
+// auth.post("/api/signOut", (req, res) => {
+//   req.session.destroy(() => {
+//     res.json({ message: "Signed out" });
+//   });
+// });
 
-auth.get("/api/currentUser", (req, res) => {
-  res.json(req.session.user || null);
-});
+auth.get("/api/currentUser", api.withRemult, AuthController.getCurrentUser);
