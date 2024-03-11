@@ -17,9 +17,11 @@ app.use(express.static("public"))
 
 //routes import
 import healthcheckRouter from "../routes/healthcheck.routes"
+import userRouter from '../routes/user.routes'
 
 //routes declaration
 app.use("/api/v1/healthcheck", healthcheckRouter)
+app.use("/api/v1/users", userRouter)
 
 app.use(auth)
 app.use(api)

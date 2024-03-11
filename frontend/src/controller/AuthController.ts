@@ -3,7 +3,7 @@ import { getAuthUser, setAuthUser } from "../utility/utility";
 export class AuthController {
 
     public static async signInHandler(formData: { userEmail: string; password: string; }) {
-        const result = await fetch("http://localhost:3002/api/signIn", {
+        const result = await fetch("http://localhost:3002/api/v1/users/signIn", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -12,19 +12,19 @@ export class AuthController {
         })
 
         // Store the response.
-        const data = await result.json();
+        const response = await result.json();
 
-        console.log(data);
+        console.log(response.data);
 
-        if (result.ok) {
+        if (response.success) {
             // get the token from the response
-            const token = data.token;
+            const token = response.data.newAccessToken;
 
             // Set the token in sessionStorage
             setAuthUser(token);
             return true;
         } else {
-            alert(data.message);
+            alert(response.message);
         }
     }
 
