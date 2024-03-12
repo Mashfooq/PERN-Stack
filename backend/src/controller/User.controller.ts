@@ -101,13 +101,13 @@ const userLogin = asyncHandler(async (req, res) => {
     const { userEmail, password } = req.body;
 
     if (!userEmail && !password) {
-        throw new ApiError(400, "username or email is required")
+        return res.json(new ApiError(400, "username or email is required"));
     }
 
     const user = await userRepo.findOne({ where: { userEmail: userEmail } });
 
     if (!user) {
-        throw new ApiError(404, "User does not exist")
+        return res.json(new ApiError(404, "User does not exist"));
     }
 
     const isPasswordValid = await validatePassword({
@@ -116,7 +116,7 @@ const userLogin = asyncHandler(async (req, res) => {
     });
 
     if (!isPasswordValid) {
-        throw new ApiError(401, "Invalid user credentials")
+        return res.json(new ApiError(401, "Invalid user credentials"));
     }
 
     const loggedInUser = await userRepo.findId(user.id);
