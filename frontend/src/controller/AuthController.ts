@@ -18,10 +18,11 @@ export class AuthController {
 
         if (response.success) {
             // get the token from the response
-            const token = response.data.newAccessToken;
+            const accessToken = response.data.newAccessToken;
+            // const refreshToken = response.data.newRefreshToken;
 
             // Set the token in sessionStorage
-            setAuthUser(token);
+            setAuthUser(accessToken);
             return true;
         } else {
             alert(response.message);
@@ -38,7 +39,7 @@ export class AuthController {
         }
 
         try {
-            const response = await fetch("http://localhost:3002/api/currentUser", {
+            const response = await fetch("http://localhost:3002/api/v1/users/currentUser", {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}` // Set the token in the Authorization header

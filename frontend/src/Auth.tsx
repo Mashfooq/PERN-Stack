@@ -6,8 +6,6 @@ import TodoHeader from "./components/TodoHeader"
 import { AuthController } from "./controller/AuthController";
 import SignOutBanner from "./components/SignOut";
 
-const USER_AGENT = "Todo-0.1";
-
 export default function Auth() {
   const initialFormData = {
     userEmail: '',

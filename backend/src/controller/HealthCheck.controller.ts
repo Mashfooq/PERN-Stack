@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 
-const healthCheck = asyncHandler(async (req, res) => {
+const healthCheck = asyncHandler(async (_req, res) => {
     // Respond with an "OK" status and a message
     res.status(200).json({ message: "Health check OK" });
 })

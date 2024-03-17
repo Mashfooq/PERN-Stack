@@ -1,6 +1,6 @@
 // src/App.tsx
 
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent, SetStateAction } from "react";
 import { remult } from "remult";
 
 // Impoer entity
@@ -57,7 +57,7 @@ export default function App() {
         orderBy: { id: "desc" }
         // where: { completed: true },
       })
-      .subscribe(info => {
+      .subscribe((info: { applyChanges: SetStateAction<Task[]>; }) => {
         setTasks(info.applyChanges);
         setTimeout(() => {
           setLoading(false);

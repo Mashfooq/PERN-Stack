@@ -1,6 +1,7 @@
 # frontend
 frontend/node_modules
 frontend/package-lock.json
+frontend/.env
 
 # backend
 backend/node_modules

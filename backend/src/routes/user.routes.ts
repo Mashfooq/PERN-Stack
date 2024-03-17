@@ -1,10 +1,17 @@
 import { Router } from 'express';
-import { userLogin } from "../controller/User.controller"
 import { api } from '../server/api';
 
+// import controller
+import { userLogin, getCurrentUser } from "../controller/User.controller"
+
+// import middlewears.
+import { verifyJWT } from '../middlewears/auth.middlewear';
+
+// Declare routers
 const router = Router();
 
 router.route('/signIn').post(api.withRemult, userLogin);
+router.route("/currentUser").get(api.withRemult, verifyJWT, getCurrentUser);
 
 export default router
 
@@ -49,7 +56,6 @@ export default router
 // router.route("/logout").post(verifyJWT,  logoutUser)
 // router.route("/refresh-token").post(refreshAccessToken)
 // router.route("/change-password").post(verifyJWT, changeCurrentPassword)
-// router.route("/current-user").get(verifyJWT, getCurrentUser)
 // router.route("/update-account").patch(verifyJWT, updateAccountDetails)
 
 // router.route("/avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar)
