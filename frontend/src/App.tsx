@@ -19,6 +19,7 @@ import TodoHeader from "./components/TodoHeader";
 const taskRepo = remult.repo(Task);
 
 export default function App() {
+  console.log("remult.user App: ", remult.user);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [loading, setLoading] = useState(true);

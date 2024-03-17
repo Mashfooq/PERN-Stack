@@ -1,5 +1,5 @@
 import { remult } from "remult";
-import  jwt  from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 
 
@@ -41,29 +41,29 @@ async function validatePassword({ enteredPassword, hashedPassword }: PasswordVal
     }
 }
 
-async function excludeSensitiveInfo({ userInfo }:UserinformationParams) {
+async function excludeSensitiveInfo({ userInfo }: UserinformationParams) {
     const { password, excludeRefreshToken, ...userWithoutSensitiveData } = userInfo;
 
     return userWithoutSensitiveData;
 }
 
-const generateAccessAndRefereshTokens = async(userId: number) =>{
+const generateAccessAndRefereshTokens = async (userId: number) => {
     try {
         const user = await userRepo.findId(userId);
 
         const newAccessToken = await generateAccessToken(user);
         const newRefreshToken = await generateRefreshToken(user.id);
 
-        await userRepo.save({...user, refreshToken: newRefreshToken});
+        await userRepo.save({ ...user, refreshToken: newRefreshToken });
 
-        return {newAccessToken, newRefreshToken}
+        return { newAccessToken, newRefreshToken }
 
     } catch (error) {
         throw new ApiError(500, "Something went wrong while generating referesh and access token")
     }
 }
 
-const generateAccessToken = async(user: User) =>{
+const generateAccessToken = async (user: User) => {
     return jwt.sign(
         {
             id: user.id,
@@ -77,11 +77,11 @@ const generateAccessToken = async(user: User) =>{
     )
 }
 
-const generateRefreshToken = async(userId: number) =>{
+const generateRefreshToken = async (userId: number) => {
     return jwt.sign(
         {
             id: userId,
-            
+
         },
         process.env.REACT_APP_REFRESH_TOKEN || MY_SECRET_KEY,
         {
@@ -147,13 +147,33 @@ const userLogin = asyncHandler(async (req, res) => {
 })
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-    return res
-    .status(200)
-    .json(new ApiResponse(
+    // Await the req.user Promise
+    const user = await req.user;
+
+    // Ensure user is defined and contains the necessary properties
+    if (!user || !user.id || !user.userEmail || !user.userName || !user.updatedAt || !user.createdAt) {
+        return res.status(400).json(new ApiResponse(400, null, "Invalid user data"));
+    }
+
+    // Extract only the desired properties
+    const { id, userEmail, userName, updatedAt, createdAt } = user;
+
+    // Create a new object with the extracted properties
+    const userDetails = {
+        id,
+        userEmail,
+        userName,
+        updatedAt,
+        createdAt
+    };
+
+    return res.status(200).json(new ApiResponse(
         200,
-        req.user,
+        {
+            user: userDetails
+        },
         "User fetched successfully"
-    ))
+    ));
 });
 
 export {

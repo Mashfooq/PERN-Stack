@@ -15,7 +15,7 @@ declare global {
     }
 }
 
-const secretKey = process.env.REACT_APP_AUTH_TOKEN || MY_SECRET_KEY;
+const secretKey = process.env.REACT_APP_AUTH_TOKEN ?? MY_SECRET_KEY;
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
     const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");

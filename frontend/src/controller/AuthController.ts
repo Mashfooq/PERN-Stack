@@ -1,4 +1,5 @@
 import { getAuthUser, setAuthUser } from "../utility/utility";
+import { remult } from "remult";
 
 export class AuthController {
 
@@ -14,9 +15,9 @@ export class AuthController {
         // Store the response.
         const response = await result.json();
 
-        console.log(response.data);
-
         if (response.success) {
+            remult.user = response.data.user;
+    
             // get the token from the response
             const accessToken = response.data.newAccessToken;
             // const refreshToken = response.data.newRefreshToken;
@@ -39,14 +40,20 @@ export class AuthController {
         }
 
         try {
-            const response = await fetch("http://localhost:3002/api/v1/users/currentUser", {
+            const result = await fetch("http://localhost:3002/api/v1/users/currentUser", {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}` // Set the token in the Authorization header
                 }
             });
 
-            if (response.ok) {
+            // Store the response.
+            const response = await result.json();
+
+            if (response.success) {
+                // Assign user data to remult
+                remult.user = response.data.user;
+        
                 // Response is okay (status code 200)
                 return true;
             } else {
