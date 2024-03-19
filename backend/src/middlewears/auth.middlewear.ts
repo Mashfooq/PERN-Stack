@@ -17,8 +17,8 @@ declare global {
 
 const secretKey = process.env.REACT_APP_AUTH_TOKEN ?? MY_SECRET_KEY;
 
-export const verifyJWT = asyncHandler(async (req, res, next) => {
-    const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+const verifyJWT = asyncHandler(async (req, res, next) => {
+    const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "") || req.cookies.AUTH_TOKEN;
 
     if (!token) {
         return res.json(new ApiError(401, "Unauthorized request."));
@@ -45,3 +45,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
         return res.json(new ApiError(401, "Invalid or expired token."));
     }
 })
+
+export {
+    verifyJWT
+}

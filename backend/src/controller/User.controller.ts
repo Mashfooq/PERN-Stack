@@ -2,7 +2,6 @@ import { remult } from "remult";
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 
-
 dotenv.config({
     path: './.env'
 })
@@ -17,6 +16,7 @@ import { ApiResponse } from "../utils/ApiResponse";
 import { MY_SECRET_KEY } from "../constants";
 
 const userRepo = remult.repo(User);
+const secretKey = process.env.REACT_APP_AUTH_TOKEN ?? MY_SECRET_KEY;
 
 interface PasswordValidationParams {
     enteredPassword: string;
@@ -83,7 +83,7 @@ const generateRefreshToken = async (userId: number) => {
             id: userId,
 
         },
-        process.env.REACT_APP_REFRESH_TOKEN || MY_SECRET_KEY,
+        secretKey,
         {
             expiresIn: process.env.REFRESH_TOKEN_EXPIRY || "1d"
         }
