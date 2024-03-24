@@ -14,7 +14,7 @@ export function setAuthUser(token: string | null) {
 }
 
 
-export function getAuthUser() {
+export function getAuthUser(): string | null {
     // Retrieve the authentication token from cookies
     const cookies = document.cookie.split(';').map(cookie => cookie.trim());
     for (const cookie of cookies) {

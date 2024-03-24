@@ -13,6 +13,7 @@ import { TasksController } from "../../backend/src/controller/TasksController";
 import InputSkeleton from "./components/InputSkeleton";
 import ButtonSkeleton from "./components/ButtonSkeleton";
 import TodoHeader from "./components/TodoHeader";
+import { AuthController } from "./controller/AuthController";
 
 // Import assets
 
@@ -31,8 +32,11 @@ export default function App() {
       // const newTask = await taskRepo.insert({ title: newTaskTitle })
       // setTasks([...tasks, newTask])
 
+      // get the userId from remult 
+      const userId = await AuthController.getCurrentUser()
+
       // This will add tasks immidiately to the component 
-      await taskRepo.insert({ title: newTaskTitle })
+      await taskRepo.insert({ title: newTaskTitle, userId: userId })
       setNewTaskTitle("")
     } catch (error) {
       alert((error as { message: string }).message)
@@ -52,22 +56,51 @@ export default function App() {
   // }, []);
 
   useEffect(() => {
-    return taskRepo
-      .liveQuery({
+    const fetchData = async () => {
+      const userId = await AuthController.getCurrentUser();
+
+      console.log("fetchdata user id:",userId)
+
+      // Construct the where clause based on the resolved userId
+      const whereClause = {
+        isActive: true,
+        userId: userId,
+      };
+
+      // Subscribe to the live query with the constructed where clause
+      const subscription = taskRepo.liveQuery({
         // limit: 9,
-        orderBy: { id: "desc" }
-        // where: { completed: true },
-      })
-      .subscribe((info: { applyChanges: SetStateAction<Task[]>; }) => {
-        setTasks(info.applyChanges);
-        setTimeout(() => {
+        orderBy: { id: "desc" },
+        where: whereClause,
+      }).subscribe({
+        next: (info) => {
+          setTasks(info.applyChanges);
+          setTimeout(() => {
+            setLoading(false);
+          }, 500);
+        },
+        error: (error) => {
+          console.error('Error occurred:', error);
           setLoading(false);
-        }, 500);
+        }
       });
+
+      return () => {
+        // Cleanup function to unsubscribe from the live query
+        subscription();
+      };
+    };
+
+    fetchData();
+
   }, []);
 
   const setAllCompleted = async (completed: boolean) => {
     await TasksController.setAllCompleted(completed)
+  }
+
+  const clearAllCompleted = async () => {
+    await TasksController.clearAllCompleted(false)
   }
 
   return (
@@ -192,19 +225,24 @@ export default function App() {
 
       {tasks.length > 0 && !loading ? (
         <div className="flex flex-row justify-center items-center">
+          <button onClick={() => clearAllCompleted()} className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
+            <span className="relative px-3 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+              Clear All Completed
+            </span>
+          </button>
           <button onClick={() => setAllCompleted(true)} className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
-            <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+            <span className="relative px-3 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
               Set All Completed
             </span>
           </button>
           <button onClick={() => setAllCompleted(false)} className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400">
-            <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+            <span className="relative px-3 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
               Set All Uncompleted
             </span>
           </button>
         </div>
       ) : (loading ? (
-        <ButtonSkeleton length={2}/>
+        <ButtonSkeleton length={3}/>
       ) : (
         <div className="flex flex-col justify-center items-center">
           <img src="/NoDataAvailable.gif" alt="No tasks available" />

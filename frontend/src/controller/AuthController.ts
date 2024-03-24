@@ -1,5 +1,5 @@
 import { getAuthUser, setAuthUser } from "../utility/utility";
-import { remult } from "remult";
+import { Remult, UserInfo, remult } from "remult";
 
 export class AuthController {
 
@@ -53,12 +53,14 @@ export class AuthController {
             if (response.success) {
                 // Assign user data to remult
                 remult.user = response.data.user;
+
+                const userId = remult.user?.id ? parseInt(remult.user.id) : undefined;
         
                 // Response is okay (status code 200)
-                return true;
+                return userId;
             } else {
                 // Handle case where response is not okay
-                return false;
+                return undefined;
             }
 
         } catch (error) {
@@ -66,8 +68,15 @@ export class AuthController {
         }
     }
 
+    public static async getCurrentUserId(remult : Remult) {
+        const userId = remult.user?.id ? parseInt(remult.user.id) : undefined;
+
+        return userId;
+    }
+
     public static async signOutHandler() {
         setAuthUser(null);
+        remult.user = undefined;
 
         // Reload the current page
         window.location.reload();

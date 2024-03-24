@@ -42,7 +42,7 @@ async function validatePassword({ enteredPassword, hashedPassword }: PasswordVal
 }
 
 async function excludeSensitiveInfo({ userInfo }: UserinformationParams) {
-    const { password, excludeRefreshToken, ...userWithoutSensitiveData } = userInfo;
+    const { password, refreshToken, ...userWithoutSensitiveData } = userInfo;
 
     return userWithoutSensitiveData;
 }
@@ -53,8 +53,6 @@ const generateAccessAndRefereshTokens = async (userId: number) => {
 
         const newAccessToken = await generateAccessToken(user);
         const newRefreshToken = await generateRefreshToken(user.id);
-
-        await userRepo.save({ ...user, refreshToken: newRefreshToken });
 
         return { newAccessToken, newRefreshToken }
 
@@ -126,6 +124,8 @@ const userLogin = asyncHandler(async (req, res) => {
 
     const { newAccessToken, newRefreshToken } = await generateAccessAndRefereshTokens(user.id)
 
+    await userRepo.save({ ...user, refreshToken: newRefreshToken });
+
     const options = {
         httpOnly: true,
         secure: true
@@ -134,12 +134,11 @@ const userLogin = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .cookie("accessToken", newAccessToken, options)
-        .cookie("refreshToken", newRefreshToken, options)
         .json(
             new ApiResponse(
                 200,
                 {
-                    user: userDetails, newAccessToken, newRefreshToken
+                    user: userDetails, newAccessToken
                 },
                 "User logged In Successfully"
             )
