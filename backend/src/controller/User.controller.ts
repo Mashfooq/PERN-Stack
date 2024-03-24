@@ -41,18 +41,16 @@ async function validatePassword({ enteredPassword, hashedPassword }: PasswordVal
     }
 }
 
-async function excludeSensitiveInfo({ userInfo }: UserinformationParams) {
+function excludeSensitiveInfo({ userInfo }: UserinformationParams) {
     const { password, refreshToken, ...userWithoutSensitiveData } = userInfo;
 
     return userWithoutSensitiveData;
 }
 
-const generateAccessAndRefereshTokens = async (userId: number) => {
+const generateAccessAndRefereshTokens = (user: User) => {
     try {
-        const user = await userRepo.findId(userId);
-
-        const newAccessToken = await generateAccessToken(user);
-        const newRefreshToken = await generateRefreshToken(user.id);
+        const newAccessToken = generateAccessToken(user);
+        const newRefreshToken = generateRefreshToken(user.id);
 
         return { newAccessToken, newRefreshToken }
 
@@ -61,7 +59,7 @@ const generateAccessAndRefereshTokens = async (userId: number) => {
     }
 }
 
-const generateAccessToken = async (user: User) => {
+const generateAccessToken = (user: User) => {
     return jwt.sign(
         {
             id: user.id,
@@ -75,7 +73,7 @@ const generateAccessToken = async (user: User) => {
     )
 }
 
-const generateRefreshToken = async (userId: number) => {
+const generateRefreshToken = (userId: number) => {
     return jwt.sign(
         {
             id: userId,
@@ -121,12 +119,12 @@ const userLogin = asyncHandler(async (req, res) => {
         return res.json(new ApiError(401, "Invalid user credentials"));
     }
 
-    const { newAccessToken, newRefreshToken } = await generateAccessAndRefereshTokens(user.id)
+    const { newAccessToken, newRefreshToken } = generateAccessAndRefereshTokens(user)
 
     await userRepo.save({ ...user, refreshToken: newRefreshToken });
 
     // Exclude the sensitive fields from the user details.
-    const userDetails = await excludeSensitiveInfo({ userInfo: user });
+    const userDetails = excludeSensitiveInfo({ userInfo: user });
 
     return res
         .status(200)
