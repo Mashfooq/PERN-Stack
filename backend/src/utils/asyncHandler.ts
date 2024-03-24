@@ -11,7 +11,7 @@ const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => P
             success: false,
             message: err.message
         });
-        res.json(new ApiError(500, "Something went wrong while generating referesh and access token"));
+        res.json(new ApiError(500, "Something went wrong."));
     }
 }
 
