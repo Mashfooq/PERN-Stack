@@ -3,18 +3,18 @@ import { Task } from "../shared/Task"
 
 export class TasksController {
   @BackendMethod({ allowed: true })
-  static async setAllCompleted(completed: boolean) {
+  static async setAllCompleted(userId: number | undefined, completed: boolean) {
     const taskRepo = remult.repo(Task)
 
-    for (const task of await taskRepo.find()) {
+    for (const task of await taskRepo.find({where: { userId: userId, isActive: true }})) {
       await taskRepo.save({ ...task, completed })
     }
   }
 
-  static async clearAllCompleted(isActive: boolean) {
+  static async clearAllCompleted(userId: number | undefined, isActive: boolean) {
     const taskRepo = remult.repo(Task)
 
-    for (const task of await taskRepo.find({where: { completed:true }})) {
+    for (const task of await taskRepo.find({where: { userId: userId, completed: true, isActive: !isActive }})) {
       await taskRepo.save({ ...task, isActive })
     }
   }

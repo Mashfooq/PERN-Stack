@@ -1,5 +1,5 @@
 import { getAuthUser, setAuthUser } from "../utility/utility";
-import { Remult, UserInfo, remult } from "remult";
+import { remult } from "remult";
 
 export class AuthController {
 
@@ -16,15 +16,12 @@ export class AuthController {
         const response = await result.json();
 
         if (response.success) {
-            remult.user = response.data.user;
-    
             // get the token from the response
             const accessToken = response.data.newAccessToken;
-            // const refreshToken = response.data.newRefreshToken;
 
             // Set the token in sessionStorage
             setAuthUser(accessToken);
-            return true;
+            return response.data.user;
         } else {
             alert(response.message);
         }
@@ -68,8 +65,13 @@ export class AuthController {
         }
     }
 
-    public static async getCurrentUserId(remult : Remult) {
-        const userId = remult.user?.id ? parseInt(remult.user.id) : undefined;
+    public static async getCurrentUserId(userDetails : any) {
+        let userId = null;
+        if (userDetails) {
+            userId = userDetails.id ? parseInt(userDetails.id) : undefined;
+        } else {
+            userId = await this.getCurrentUser();
+        }
 
         return userId;
     }

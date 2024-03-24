@@ -19,27 +19,29 @@ import { AuthController } from "./controller/AuthController";
 
 const taskRepo = remult.repo(Task);
 
-export default function App() {
-  console.log("remult.user App: ", remult.user);
+export default function App(props: { userDetails: any; }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const { userDetails } = props;
+
   const addTask = async (e: FormEvent) => {
     e.preventDefault()
     try {
+      // get the userId from userDetails 
+      const userId = await AuthController.getCurrentUserId(userDetails);
+
       // we should remove the manual adding of new Tasks to the component's state:
       // const newTask = await taskRepo.insert({ title: newTaskTitle })
       // setTasks([...tasks, newTask])
-
-      // get the userId from remult 
-      const userId = await AuthController.getCurrentUser()
 
       // This will add tasks immidiately to the component 
       await taskRepo.insert({ title: newTaskTitle, userId: userId })
       setNewTaskTitle("")
     } catch (error) {
-      alert((error as { message: string }).message)
+      // Handle errors
+      alert((error as { message: string }).message);
     }
   }
 
@@ -57,9 +59,7 @@ export default function App() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const userId = await AuthController.getCurrentUser();
-
-      console.log("fetchdata user id:",userId)
+      const userId = await AuthController.getCurrentUserId(userDetails);
 
       // Construct the where clause based on the resolved userId
       const whereClause = {
@@ -96,11 +96,13 @@ export default function App() {
   }, []);
 
   const setAllCompleted = async (completed: boolean) => {
-    await TasksController.setAllCompleted(completed)
+    const userId = await AuthController.getCurrentUserId(userDetails);
+    await TasksController.setAllCompleted(userId, completed)
   }
 
   const clearAllCompleted = async () => {
-    await TasksController.clearAllCompleted(false)
+    const userId = await AuthController.getCurrentUserId(userDetails);
+    await TasksController.clearAllCompleted(userId, false)
   }
 
   return (

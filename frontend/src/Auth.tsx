@@ -14,11 +14,14 @@ export default function Auth() {
 
   const [formData, setFormData] = useState(initialFormData);
   const [signedIn, setSignedIn] = useState(false)
+  const [userDetails, setUserDetails] = useState(null);
 
   const signIn = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (await AuthController.signInHandler(formData)) {
+    let user = null; 
+    if (user = await AuthController.signInHandler(formData)) {
+      setUserDetails(user);
       setSignedIn(true)
       setFormData(initialFormData);
     }
@@ -106,7 +109,7 @@ export default function Auth() {
     return (
       <>
         <SignOutBanner />
-        <App />
+        <App userDetails={userDetails} />
       </>
     )
   }

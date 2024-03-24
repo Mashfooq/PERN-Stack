@@ -26,11 +26,10 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
 
     try {
         // Verify and decode the JWT token
-        const decodedToken = jwt.verify(token, secretKey) as { userId: number };
-        const userId = decodedToken.userId;
+        const decodedToken = jwt.verify(token, secretKey) as { id: number };
 
         // Retrieve the user details from the database
-        const user = await remult.repo(User).findOne({ where: { id: userId } });
+        const user = await remult.repo(User).findOne({ where: { id: decodedToken.id } });
 
         if (!user) {
             return res.json(new ApiError(404, "User not found."));
@@ -41,7 +40,6 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
         next();
     } catch (error) {
         // Handle JWT verification errors
-        console.error("JWT verification failed:", error);
         return res.json(new ApiError(401, "Invalid or expired token."));
     }
 })
