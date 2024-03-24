@@ -1,6 +1,7 @@
 import { remult } from "remult";
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
+import bcrypt from 'bcryptjs';
 
 dotenv.config({
     path: './.env'
@@ -14,6 +15,7 @@ import { ApiError } from "../utils/ApiErrors";
 import { User } from "../shared/User"
 import { ApiResponse } from "../utils/ApiResponse";
 import { MY_SECRET_KEY } from "../constants";
+import { httpOnlyAndSecureOption } from "../utils/Utility";
 
 const userRepo = remult.repo(User);
 const secretKey = process.env.REACT_APP_AUTH_TOKEN ?? MY_SECRET_KEY;
@@ -30,10 +32,8 @@ interface UserinformationParams {
 // Method to validate user password.
 async function validatePassword({ enteredPassword, hashedPassword }: PasswordValidationParams) {
     try {
-        // TODO: Bycrpt
         // Compare the entered password with the hashed password
-        // return await bcrypt.compare(enteredPassword, hashedPassword);
-        return enteredPassword === hashedPassword;
+        return await bcrypt.compare(enteredPassword, hashedPassword);
     } catch (error) {
         // Handle any errors that occur during the comparison process
         console.error("Error occurred while validating password:", error);
@@ -90,11 +90,11 @@ const generateRefreshToken = async (userId: number) => {
 
 const userLogin = asyncHandler(async (req, res) => {
     // req body -> data
-    // username or email
-    //find the user
-    //password check
-    //access and referesh token
-    //send cookie
+    // Validate email
+    // find the user
+    // validate password
+    // access and referesh token
+    // send res with cookie
 
     const { userEmail, password } = req.body;
 
@@ -108,32 +108,29 @@ const userLogin = asyncHandler(async (req, res) => {
         return res.json(new ApiError(404, "User does not exist"));
     }
 
+    // TODO: Remove this on impleenting Sign up
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const isPasswordValid = await validatePassword({
-        enteredPassword: password,
-        hashedPassword: user.password
+        enteredPassword: user.password, 
+        hashedPassword: hashedPassword // change to password on implementing sign up
     });
 
     if (!isPasswordValid) {
         return res.json(new ApiError(401, "Invalid user credentials"));
     }
 
-    const loggedInUser = await userRepo.findId(user.id);
-
-    // Exclude the sensitive fields from the user details.
-    const userDetails = await excludeSensitiveInfo({ userInfo: loggedInUser });
-
     const { newAccessToken, newRefreshToken } = await generateAccessAndRefereshTokens(user.id)
 
     await userRepo.save({ ...user, refreshToken: newRefreshToken });
 
-    const options = {
-        httpOnly: true,
-        secure: true
-    }
+    // Exclude the sensitive fields from the user details.
+    const userDetails = await excludeSensitiveInfo({ userInfo: user });
 
     return res
         .status(200)
-        .cookie("accessToken", newAccessToken, options)
+        .cookie("accessToken", newAccessToken, httpOnlyAndSecureOption())
         .json(
             new ApiResponse(
                 200,
