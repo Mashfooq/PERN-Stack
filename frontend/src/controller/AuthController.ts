@@ -1,24 +1,29 @@
 import { getAuthUser, setAuthUser } from "../utility/utility";
 import { remult } from "remult";
 
+type FormValues = {
+    userEmail: string;
+    password: string;
+  };
+
 export class AuthController {
 
-    public static async signInHandler(formData: { userEmail: string; password: string; }) {
+    public static async signInHandler(formData: FormValues) {
         const result = await fetch("http://localhost:3002/api/v1/users/signIn", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ "userEmail": formData.userEmail, "password": formData.password })
-        })
-
+            body: JSON.stringify(formData) // Pass formData directly
+        });
+    
         // Store the response.
         const response = await result.json();
-
+    
         if (response.success) {
             // get the token from the response
             const accessToken = response.data.newAccessToken;
-
+    
             // Set the token in sessionStorage
             setAuthUser(accessToken);
             return response.data.user;
